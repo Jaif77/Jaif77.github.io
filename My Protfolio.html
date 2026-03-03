@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaif · cybersecurity portfolio</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font: Inter (modern sans) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #eee;
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* dark scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2e7d32;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1b5e20;
+        }
+
+        /* loading overlay */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        .loader-content {
+            text-align: center;
+            width: 240px;
+        }
+
+        .loader-content .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #1db954;
+            text-shadow: 0 0 15px #1db95455;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #1e2a1e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #1db954;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #1db954;
+            transition: width 2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        /* main layout */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- fixed left sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: #0d0d0d;
+            border-right: 1px solid #1e2a1e;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .logo-side {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1db954;
+            margin-bottom: 3rem;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 8px #1db95488;
+        }
+
+        .nav {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            margin: 0.4rem 0;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #1a2a1a;
+            color: #fff;
+            border-left-color: #1db954;
+        }
+
+        .support-btn {
+            background: transparent;
+            border: 1.5px solid #1db954;
+            color: #1db954;
+            padding: 0.9rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .support-btn:hover {
+            background: #1db954;
+            color: #000;
+            box-shadow: 0 0 20px #1db95477;
+        }
+
+        /* main content (scrollable) */
+        .main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 2rem 3rem;
+        }
+
+        /* content that appears below hero */
+        .content-below {
+            position: relative;
+            background: #0a0a0a;
+            z-index: 10;
+            padding: 2rem 3rem;
+        }
+
+        section {
+            margin-bottom: 7rem;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* headings */
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        h2 i {
+            color: #1db954;
+            margin-right: 10px;
+        }
+
+        /* --- hero swirl effect (adapted to jaif) --- */
+        .hero {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            color: white;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero h1 span {
+            color: #1db954;
+            font-size: 0.6em;
+            display: block;
+            margin-top: 0.3rem;
+            font-weight: 400;
+        }
+
+        /* profile section (about + picture) */
+        .about-grid {
+            display: flex;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 2;
+            min-width: 300px;
+            background: #111;
+            padding: 2rem;
+            border-radius: 32px;
+            border-left: 8px solid #1db954;
+            font-size: 1.1rem;
+            color: #ddd;
+        }
+
+        .profile-pic {
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .pic-placeholder {
+            background: linear-gradient(145deg, #1a2a1a, #0f1a0f);
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #1db954;
+            box-shadow: 0 0 40px #1db95466;
+        }
+
+        .pic-placeholder i {
+            font-size: 6rem;
+            color: #1db954cc;
+        }
+
+        .pic-caption {
+            margin-top: 1rem;
+            font-weight: 300;
+            color: #aaa;
+        }
+
+        /* projects grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: #131313;
+            border-radius: 28px;
+            padding: 2rem 1.5rem;
+            border: 1px solid #272727;
+            transition: 0.25s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-card:hover {
+            transform: scale(1.02) translateY(-6px);
+            border-color: #1db954;
+            box-shadow: 0 20px 30px #1db95422;
+        }
+
+        .project-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #fff;
+        }
+
+        .project-card p {
+            color: #1db954;
+            font-weight: 500;
+        }
+
+        .contact-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .contact-form {
+            width: 100%;
+            max-width: 600px;
+            background: #111;
+            border-radius: 40px;
+            padding: 3rem;
+            border: 2px solid #1db95433;
+            box-shadow: 0 0 50px #1db95433;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            margin-bottom: 1.8rem;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 1.2rem 1.8rem;
+            background: #1f1f1f;
+            border: 2px solid #333;
+            border-radius: 50px;
+            font-family: inherit;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1db954;
+            box-shadow: 0 0 20px #1db954;
+            transform: scale(1.02);
+        }
+
+        button.send {
+            background: #1db954;
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: black;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        button.send:hover {
+            box-shadow: 0 0 40px #1db954;
+            transform: translateY(-3px);
+            background: #2ecc71;
+        }
+
+        button.send i {
+            transition: transform 0.3s ease;
+        }
+
+        button.send:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Section title centered */
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            color: white;
+            width: 100%;
+        }
+
+        .section-title i {
+            color: #1db954;
+            margin-right: 15px;
+        }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            .contact-form {
+                padding: 2rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        .footer-copyright {
+            margin-top: 4rem;
+            color: #6a6a6a;
+            text-align: center;
+            padding: 2rem 0 1rem;
+            border-top: 1px solid #222;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- loading screen -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="logo">JAIF<span style="color:#aaa;">.</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="loaderFill"></div>
+            </div>
+            <p style="color:#aaa; margin-top:1rem;">loading secure portfolio...</p>
+        </div>
+    </div>
+    <div class="container">
+        <!-- fixed sidebar (jaif version) -->
+        <aside class="sidebar">
+            <div class="logo-side">JAIF <span style="color:#666;">IBNE </span>JALIL</div>
+            <nav class="nav">
+                <a href="#about" class="nav-item"><i class="fas fa-user-shield" style="width: 1.8rem;"></i> About</a>
+                <a href="#projects" class="nav-item"><i class="fas fa-laptop-code"></i> Projects</a>
+                <a href="#contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+            </nav>
+            <div class="support-btn"><i class="fas fa-heart" style="margin-right: 8px;"></i>Support Me</div>
+        </aside>
+        <!-- main content -->
+        <main class="main">
+            <!-- hero with greeting (jaif) -->
+            <section id="hero" class="hero visible" style="opacity:1; transform:none;">
+                <div class="hero-content">
+                    <h1>Welcome to My Portfolio<br><span>I'm a Computer Science Student.</span></h1>
+                </div>
+            </section>
+            <!-- about section (with profile picture) -->
+            <section id="about" class="section-fade">
+                <h2><i class="fas fa-user-secret"></i> About Me</h2>
+                <div class="about-grid">
+                    <div class="about-text">
+                        <p>Hi, I’m Jaif — a passionate student with big dreams of becoming a cybersecurity professional
+                            dedicated to serving my country. Born and raised in Dhaka, I’ve always been fascinated by
+                            the potential of technology to solve real-world problems and make a meaningful impact. Right
+                            now, I’m focusing on building the knowledge and skills I need to excel in the field of
+                            cybersecurity. My ultimate goal is to protect critical systems and contribute to a safer and
+                            more secure digital future for Bangladesh. When I’m not studying or exploring the latest in
+                            tech, you’ll often find me with my nose in a book. I love reading titles that inspire
+                            self-growth and offer valuable insights for building a better life. For me, every book is a
+                            step closer to becoming the best version of myself. I believe in continuous learning, hard
+                            work, and using my abilities to make a difference. Thanks for taking the time to get to know
+                            me — I’m always open to connecting with like-minded individuals who share a passion for
+                            making the world a better place.</p>
+                    </div>
+                    <div class="profile-pic">
+                        <div class="pic-placeholder">
+                            <img src="your-3d-sticker.png" alt="Description of image">
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+            <!-- projects section -->
+            <section id="projects" class="section-fade">
+                <h2><i class="fas fa-diagram-project"></i> My Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <h3>🔐 IDS-Viz</h3>
+                        <p>Project 1: An Interactive Visualization Tool for Analyzing Vulnerabilities in ML-Based
+                            Intrusion Detection Systems.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>📇 DIU Biometric Attendance</h3>
+                        <p>Project 2: Fingerprint recognition attendance system for university.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>✈️ Travel Agency UI/UX Design</h3>
+                        <p>Project 3: A perfect booking & client management system</p>
+                    </div>
+                </div>
+            </section>
+            <!-- contact section -->
+            <section id="contact" class="section-fade">
+                <h2><i class="fas fa-address-card"></i> Contact Me</h2>
+                <div class="contact-form">
+                    <form id="jaifContactForm"
+                        onsubmit="event.preventDefault(); alert('✅ Message sent (demo) — thanks Jaif!');">
+                        <div class="input-group">
+                            <input type="text" placeholder="Name:" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" placeholder="Email:" required>
+                        </div>
+                        <div class="input-group">
+                            <textarea rows="4" placeholder="Message:" required></textarea>
+                        </div>
+                        <button class="send" type="submit"><i class="fas fa-paper-plane" style="margin-right: 8px;"></i>
+                            Send</button>
+                    </form>
+                </div>
+            </section>
+            <!-- footer / copyright -->
+            <div class="footer-copyright">
+                © 2024 My Portfolio | Designed by Jaif
+            </div>
+        </main>
+    </div>
+    <!-- intersection observer + loader & active nav -->
+    <script>
+        (function () {
+            // loading screen
+            const loader = document.getElementById('loader');
+            const fill = document.getElementById('loaderFill');
+            if (fill) {
+                setTimeout(() => { fill.style.width = '100%'; }, 100);
+            }
+            setTimeout(() => {
+                if (loader) {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                }
+            }, 2200);
+
+            // fade/slide sections on scroll
+            const sections = document.querySelectorAll('.section-fade');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: '20px' });
+            sections.forEach(section => observer.observe(section));
+            // after load, set active nav link
+            const navItems = document.querySelectorAll('.nav-item');
+            const setActive = () => {
+                let fromTop = window.scrollY + 300;
+                document.querySelectorAll('section').forEach(s => {
+                    const id = s.getAttribute('id');
+                    const link = document.querySelector(`.nav-item[href="#${id}"]`);
+                    if (link) {
+                        if (s.offsetTop <= fromTop && s.offsetTop + s.offsetHeight > fromTop) {
+                            navItems.forEach(i => i.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    }
+                });
+            };
+            window.addEventListener('scroll', setActive);
+        })();
+    </script>
+</body>
+
+</html>
